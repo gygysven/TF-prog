@@ -77,7 +77,7 @@ def mostrar_recomendaciones(recomendaciones, tipo):
                 print(f"{item['titulo']:<25} | {item['director']:<20}, {item['año']:<5}")
 
 def recomendaciones(tipo):
-    archivo = "libros.json" if tipo=="libro" else "peliculas,json"
+    archivo = "libros.json" if tipo=="libro" else "peliculas.json"
     items = cargar_datos(archivo)
     mostrar_recomendaciones(items,tipo)
     generos, persona, año_min, año_max = obtener_preferencias(tipo)
