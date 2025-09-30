@@ -55,7 +55,7 @@ def recomendar(items, tipo, generos_pref, persona_pref, año_min, año_max):
             continue
 
         if puntuacion > 0:
-            recomendaciones.append((item))
+            recomendaciones.append((item, puntuacion    ))
 
     recomendaciones.sort(key=lambda x: x[1], reverse=True)
     return recomendaciones
@@ -64,25 +64,37 @@ def mostrar_recomendaciones(recomendaciones, tipo):
     print("\n------ RECOMENDACIONES ------")
     if not recomendaciones:
         print(f"No se encontraron {tipo} que coincidan con tus preferencias.")
-        
     else:
+        max_titulo = max(len(item[0]['titulo']) for item in recomendaciones)
+        max_autor_o_director = max(len(item[0]['autor']) if tipo == "libro" else len(item[0]['director']) for item in recomendaciones)
+        max_genero = max(len(", ".join(item[0]['genero'])) for item in recomendaciones)
+        max_año = max(len(str(item[0]['año'])) for item in recomendaciones)
+
+        max_titulo += 5
+        max_autor_o_director += 5
+        max_genero += 5
+        max_año += 5
+
+        if tipo == "libro":
+            print(f"{'NOMBRE':<{max_titulo}} | {'AUTOR':<{max_autor_o_director}} | {'GÉNERO':<{max_genero}} | {'AÑO':<{max_año}}")
+        else:
+            print(f"{'NOMBRE':<{max_titulo}} | {'DIRECTOR':<{max_autor_o_director}} | {'GÉNERO':<{max_genero}} | {'AÑO':<{max_año}}")
+        print("-" * (max_titulo + max_autor_o_director + max_genero + max_año + 6))  
+
         for item in recomendaciones:
-            if tipo=="libro":
-                print(f"\n{'NOMBRE':<25} | {'AUTOR':<20} | {'AÑO':<5}")
-                print("-"*58)
-                print(f"\n{item['titulo']:<25} | {item['autor']:<20} | {item['año']:<5}")
+            if tipo == "libro":
+                genero_str = ", ".join(item[0]["genero"]) if isinstance(item[0]["genero"], list) else item[0]["genero"]
+                print(f"{item[0]['titulo']:<{max_titulo}} | {item[0]['autor']:<{max_autor_o_director}} | {genero_str:<{max_genero}} | {item[0]['año']:<{max_año}}")
             else:
-                print(f"\n{'NOMBRE':<25} | {'DIRECTOR':<20} | {'AÑO':<5}")
-                print("-"*58)
-                print(f"{item['titulo']:<25} | {item['director']:<20}, {item['año']:<5}")
+                genero_str = item[0]['genero'] if isinstance(item[0]['genero'], str) else ", ".join(item[0]['genero'])
+                print(f"{item[0]['titulo']:<{max_titulo}} | {item[0]['director']:<{max_autor_o_director}} | {genero_str:<{max_genero}} | {item[0]['año']:<{max_año}}")
 
 def recomendaciones(tipo):
     archivo = "libros.json" if tipo=="libro" else "peliculas.json"
     items = cargar_datos(archivo)
-    mostrar_recomendaciones(items,tipo)
     generos, persona, año_min, año_max = obtener_preferencias(tipo)
-    recomendaciones = recomendar(items, generos, persona, año_min, año_max)
-    mostrar_recomendaciones(recomendaciones)
+    recomendaciones = recomendar(items, tipo, generos, persona, año_min, año_max)
+    mostrar_recomendaciones(recomendaciones, tipo)
 
 def tipo():
     while True:
